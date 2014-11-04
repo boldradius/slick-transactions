@@ -1,6 +1,12 @@
+import sbtrelease.ReleasePlugin.ReleaseKeys._
+
+import sbtrelease.ReleasePlugin._
+
 name := """slick-transactions"""
 
 version := "0.0.3"
+
+useGlobalVersion := false
 
 organization := "com.boldradius"
 
@@ -21,6 +27,8 @@ libraryDependencies ++= Seq(
 )
 
 bintraySettings
+
+releaseSettings
 
 bintray.Keys.bintrayOrganization in bintray.Keys.bintray := Some("boldradiussolutions")
 
