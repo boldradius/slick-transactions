@@ -27,9 +27,16 @@ package object transactions {
    *  b. or take in the session, so that they can be run as part of an eventual transaction
    *  c. or, as a last resort, return IO after having made one or more calls to [[transaction]].
    *
-   * The transaction is set to use the serializable isolation level, and will retry as many times
+   * The transaction is set to use the serializable isolation level, and will retry immediately as many times
    * as necessary in the even of a serialization failure (when concurrent transactions have
-   * invalidated the work of this transaction).
+   * invalidated the work of this transaction). No exponential back-off is currently implemented.
+   *
+   * Care must be taken not to leak the session our of the call to transaction. The returned type A should
+   * not contain the session: it will be closed and unusable. This can happen accidentally if you create a closure
+   * that closes over the session. In the presence of nested transactions, a call to [[IO.map]] on the inner transaction
+   * would have the outer session in lexical scope but its execution would be delayed until after the session is closed.
+   * We may solve this in the future by no longer exposing the session and using a monad to compose parts of the
+   * transaction.
    */
   def transaction[A](db : PostgresDriver.backend.DatabaseDef)(txn: PostgresDriver.backend.Session => A): IO[A] = {
     val serializationFailureErrorCode = "40001" // http://www.postgresql.org/docs/8.3/static/errcodes-appendix.html

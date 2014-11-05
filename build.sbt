@@ -4,8 +4,6 @@ import sbtrelease.ReleasePlugin._
 
 name := """slick-transactions"""
 
-//version := "0.0.3"
-
 useGlobalVersion := false
 
 organization := "com.boldradius"
