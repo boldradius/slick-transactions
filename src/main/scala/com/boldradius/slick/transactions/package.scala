@@ -31,7 +31,7 @@ package object transactions {
    * as necessary in the even of a serialization failure (when concurrent transactions have
    * invalidated the work of this transaction). No exponential back-off is currently implemented.
    *
-   * Care must be taken not to leak the session our of the call to transaction. The returned type A should
+   * Care must be taken not to leak the session out of the call to transaction. The returned type A should
    * not contain the session: it will be closed and unusable. This can happen accidentally if you create a closure
    * that closes over the session. In the presence of nested transactions, a call to [[IO.map]] on the inner transaction
    * would have the outer session in lexical scope but its execution would be delayed until after the session is closed.
