@@ -56,4 +56,21 @@ package object transactions {
     IO(retryOnSerializationFailure)
   }
 
+  /**
+   *  Same as [[transaction]] but rolls back the transaction when a Left is produced by running 'txn'.
+   * @param db
+   * @param txn
+   * @tparam E
+   * @tparam A
+   * @return
+   */
+  def transactionRight[E, A](db : PostgresDriver#Backend#DatabaseDef)(txn: DBIO[Either[E, A]]): IO[Either[E, A]] = {
+    case class EException(e: E) extends Throwable
+    import scala.concurrent.ExecutionContext.Implicits.global
+    try {
+      transaction(db)(txn.flatMap(_.fold[DBIO[A]](e => DBIO.failed(EException(e)), DBIO.successful(_)))).map(Right(_))
+    } catch {
+      case EException(e) => IO(Left(e))
+    }
+  }
 }
